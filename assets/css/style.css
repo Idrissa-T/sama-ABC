@@ -1,0 +1,181 @@
+/* =====================================================================
+   A & P BRIQUES — ABC
+   Palette inspirée du métier : terre cuite, béton, ocre.
+   ===================================================================== */
+
+:root {
+  --brique: #a8452c;
+  --brique-clair: #d98b6f;
+  --brique-fonce: #7d3120;
+  --beton: #5c6b73;
+  --ocre: #c8963e;
+}
+
+body {
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* ---------- Barre de navigation ---------- */
+.bg-brique {
+  background-color: var(--brique) !important;
+}
+
+.btn-brique {
+  background-color: var(--brique);
+  border-color: var(--brique);
+  color: #fff;
+}
+
+.btn-brique:hover,
+.btn-brique:focus {
+  background-color: var(--brique-fonce);
+  border-color: var(--brique-fonce);
+  color: #fff;
+}
+
+.btn-brique:disabled {
+  background-color: var(--brique-clair);
+  border-color: var(--brique-clair);
+}
+
+/* ---------- Logo : motif de brique ---------- */
+.logo-brique {
+  display: inline-block;
+  width: 22px;
+  height: 14px;
+  vertical-align: -2px;
+  background-color: #fff;
+  border-radius: 2px;
+  position: relative;
+}
+
+.logo-brique::before,
+.logo-brique::after {
+  content: '';
+  position: absolute;
+  background-color: var(--brique);
+}
+
+.logo-brique::before {
+  left: 0;
+  right: 0;
+  top: 6px;
+  height: 2px;
+}
+
+.logo-brique::after {
+  top: 0;
+  bottom: 0;
+  left: 10px;
+  width: 2px;
+}
+
+.logo-lg {
+  width: 56px;
+  height: 36px;
+  background-color: var(--brique);
+}
+
+.logo-lg::before {
+  top: 16px;
+  height: 4px;
+  background-color: #fff;
+}
+
+.logo-lg::after {
+  left: 26px;
+  width: 4px;
+  background-color: #fff;
+}
+
+/* ---------- Page de connexion ---------- */
+.page-login {
+  min-height: 100vh;
+  background:
+    linear-gradient(135deg, rgba(168, 69, 44, 0.92), rgba(92, 107, 115, 0.92)),
+    repeating-linear-gradient(0deg, #b5573c 0 28px, #a8452c 28px 30px);
+}
+
+/* ---------- Cartes d'indicateurs ---------- */
+.kpi {
+  border-left: 4px solid var(--brique);
+}
+
+.kpi.kpi-alerte {
+  border-left-color: #c0392b;
+  background-color: #fdf3f2;
+}
+
+.kpi-label {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #6c757d;
+  margin-bottom: 0.35rem;
+}
+
+.kpi-valeur {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: 0.15rem;
+  line-height: 1.2;
+}
+
+.kpi-detail {
+  font-size: 0.78rem;
+  color: #6c757d;
+  margin-bottom: 0;
+}
+
+/* ---------- Matrice des clés de répartition ---------- */
+.table-matrice th {
+  font-size: 0.8rem;
+  vertical-align: middle;
+}
+
+.table-matrice input.cle-input {
+  min-width: 68px;
+}
+
+.table-matrice tr.ligne-anomalie td:first-child {
+  border-left: 3px solid #c0392b;
+}
+
+.total-ligne {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Chiffres alignés dans toutes les colonnes de montants */
+td.text-end,
+th.text-end {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Tableaux ---------- */
+.table > :not(caption) > * > * {
+  padding: 0.45rem 0.6rem;
+}
+
+.card-header {
+  background-color: #fff;
+  border-bottom: 2px solid #f1f1f1;
+}
+
+/* ---------- Impression : états prêts à joindre au mémoire ---------- */
+@media print {
+  .navbar,
+  footer,
+  .btn,
+  form .d-flex {
+    display: none !important;
+  }
+
+  .card {
+    border: 1px solid #ccc !important;
+    break-inside: avoid;
+  }
+
+  body {
+    background: #fff !important;
+  }
+}
