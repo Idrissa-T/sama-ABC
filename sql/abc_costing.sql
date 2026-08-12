@@ -217,6 +217,9 @@ CREATE TABLE journal_audit (
 
 -- =====================================================================
 --  2. VUES DE CALCUL  (le moteur ABC est en SQL, PHP ne fait qu'afficher)
+--  Note : les colonnes de statut calculees portent un COLLATE explicite.
+--  Sans cela, MySQL leve une erreur 1267 (Illegal mix of collations) des
+--  qu'on les compare a un parametre lie depuis PHP.
 -- =====================================================================
 
 -- 2.1 Controle de coherence des cles : doit valoir 100 % par ressource
@@ -230,7 +233,8 @@ SELECT
   SUM(c.pourcentage)      AS total_pourcentage,
   ROUND(100 - SUM(c.pourcentage), 4) AS ecart,
   CASE WHEN ABS(100 - SUM(c.pourcentage)) < 0.0001
-       THEN 'CONFORME' ELSE 'ANOMALIE' END AS statut
+       THEN 'CONFORME' ELSE 'ANOMALIE' END
+       COLLATE utf8mb4_unicode_ci AS statut
 FROM cles_ressources c
 JOIN ressources r ON r.id = c.ressource_id
 JOIN periodes  p ON p.id = c.periode_id
@@ -384,7 +388,8 @@ SELECT
              / (cd.quantite_produite * cd.prix_vente_unitaire) END, 2) AS taux_marge_abc,
   CASE WHEN cd.quantite_produite * cd.prix_vente_unitaire
             - (cd.cout_matieres + cd.cout_mod + COALESCE(ia.indirect_abc,0)) < 0
-       THEN 'DEFICITAIRE' ELSE 'RENTABLE' END AS statut_rentabilite_abc
+       THEN 'DEFICITAIRE' ELSE 'RENTABLE' END
+       COLLATE utf8mb4_unicode_ci AS statut_rentabilite_abc
 FROM couts_directs cd
 JOIN objets_cout o        ON o.id = cd.objet_cout_id
 JOIN v_totaux_periode t   ON t.periode_id = cd.periode_id
@@ -418,11 +423,11 @@ FROM v_totaux_periode t;
 
 INSERT INTO utilisateurs (login, mot_de_passe, nom_complet, email, role) VALUES
 ('admin',      '$2y$10$QgyQm3csJ07Y0oQKt.trTO/1Qn3pcwCdG7.cmPGrFEdMQkhxHmwsi',
- 'Administrateur Systeme', 'admin@ap-briques.sn',      'ADMIN'),
+ 'Administrateur Système', 'admin@ap-briques.sn',      'ADMIN'),
 ('controleur', '$2y$10$V.8OYeZjXoop2e84YCudyO6YvbfjtAkIDOn9O98Kw.Yw9ZaarNT4G',
- 'Aminata Sow - Controle de gestion', 'a.sow@ap-briques.sn', 'CONTROLEUR'),
+ 'Aminata Sow — Contrôle de gestion', 'a.sow@ap-briques.sn', 'CONTROLEUR'),
 ('lecteur',    '$2y$10$i4/ALQhs0SpshbQKNkoePueLfyRi3ShVEfAAfnrAiU9Y/UQTXZyM2',
- 'Moussa Fall - Direction generale', 'm.fall@ap-briques.sn', 'LECTEUR');
+ 'Moussa Fall — Direction générale', 'm.fall@ap-briques.sn', 'LECTEUR');
 
 -- ---------------------------------------------------------------------
 -- 3.1 Periodes
@@ -436,17 +441,17 @@ INSERT INTO periodes (code, libelle, date_debut, date_fin, statut) VALUES
 --     Total des charges indirectes de juin 2026 = 48 000 000 FCFA
 -- ---------------------------------------------------------------------
 INSERT INTO ressources (code, libelle, nature, compte_syscohada) VALUES
-('R1', 'Salaires du personnel indirect (chefs d equipe, magasinier, laborantin)',
+('R1', 'Salaires du personnel indirect (chefs d''équipe, magasinier, laborantin)',
        'PERSONNEL',         '661'),
-('R2', 'Energie electrique et eau (presse, malaxeur, arrosage de cure)',
+('R2', 'Énergie électrique et eau (presse, malaxeur, arrosage de cure)',
        'ENERGIE',           '605'),
-('R3', 'Loyer du site et aires de sechage',
+('R3', 'Loyer du site et aires de séchage',
        'IMMOBILIER',        '622'),
-('R4', 'Amortissements (presse a briques, malaxeur, moules, chariots)',
+('R4', 'Amortissements (presse à briques, malaxeur, moules, chariots)',
        'AMORTISSEMENT',     '681'),
-('R5', 'Fournitures et pieces d usure (moules, huile de demoulage, adjuvants)',
+('R5', 'Fournitures et pièces d''usure (moules, huile de démoulage, adjuvants)',
        'FOURNITURE',        '604'),
-('R6', 'Services exterieurs (transport sur ventes, maintenance, telecom)',
+('R6', 'Services extérieurs (transport sur ventes, maintenance, télécom)',
        'SERVICE_EXTERIEUR', '628');
 
 INSERT INTO ressource_montants (ressource_id, periode_id, montant) VALUES
@@ -461,22 +466,22 @@ INSERT INTO ressource_montants (ressource_id, periode_id, montant) VALUES
 -- 3.3 Carte des activites et inducteurs
 -- ---------------------------------------------------------------------
 INSERT INTO activites (code, libelle, processus, type_activite, niveau_hierarchique) VALUES
-('A1', 'Approvisionner en ciment, sable et laterite', 'Approvisionnement', 'PRINCIPALE', 'LOT'),
-('A2', 'Receptionner et stocker les matieres',        'Approvisionnement', 'PRINCIPALE', 'LOT'),
-('A3', 'Changer les moules et regler la presse',      'Production',        'PRINCIPALE', 'LOT'),
-('A4', 'Malaxer et presser les elements',             'Production',        'PRINCIPALE', 'UNITE'),
-('A5', 'Conduire la cure et le sechage',              'Production',        'PRINCIPALE', 'LOT'),
-('A6', 'Controler la qualite (essais de compression)','Qualite',           'PRINCIPALE', 'LOT'),
+('A1', 'Approvisionner en ciment, sable et latérite', 'Approvisionnement', 'PRINCIPALE', 'LOT'),
+('A2', 'Réceptionner et stocker les matières',        'Approvisionnement', 'PRINCIPALE', 'LOT'),
+('A3', 'Changer les moules et régler la presse',      'Production',        'PRINCIPALE', 'LOT'),
+('A4', 'Malaxer et presser les éléments',             'Production',        'PRINCIPALE', 'UNITE'),
+('A5', 'Conduire la cure et le séchage',              'Production',        'PRINCIPALE', 'LOT'),
+('A6', 'Contrôler la qualité (essais de compression)','Qualité',           'PRINCIPALE', 'LOT'),
 ('A7', 'Palettiser, charger et livrer sur chantier',  'Distribution',      'PRINCIPALE', 'LOT'),
 ('A8', 'Administrer les commandes clients',           'Support',           'SUPPORT',    'PRODUIT');
 
 INSERT INTO inducteurs (activite_id, libelle, unite_oeuvre, capacite_pratique) VALUES
-((SELECT id FROM activites WHERE code='A1'), 'Nombre de commandes d achat',        'commande',     260),
-((SELECT id FROM activites WHERE code='A2'), 'Nombre de receptions',               'reception',    240),
+((SELECT id FROM activites WHERE code='A1'), 'Nombre de commandes d''achat',        'commande',     260),
+((SELECT id FROM activites WHERE code='A2'), 'Nombre de réceptions',               'reception',    240),
 ((SELECT id FROM activites WHERE code='A3'), 'Nombre de changements de moule',     'changement',   330),
 ((SELECT id FROM activites WHERE code='A4'), 'Heures de presse',                   'heure',       1320),
 ((SELECT id FROM activites WHERE code='A5'), 'Palettes-jours en aire de cure',     'palette-jour',24000),
-((SELECT id FROM activites WHERE code='A6'), 'Nombre d essais de compression',     'essai',        340),
+((SELECT id FROM activites WHERE code='A6'), 'Nombre d''essais de compression',     'essai',        340),
 ((SELECT id FROM activites WHERE code='A7'), 'Nombre de livraisons',               'livraison',    500),
 ((SELECT id FROM activites WHERE code='A8'), 'Nombre de commandes clients',        'commande',     660);
 
@@ -487,67 +492,67 @@ INSERT INTO inducteurs (activite_id, libelle, unite_oeuvre, capacite_pratique) V
 INSERT INTO cles_ressources (ressource_id, activite_id, periode_id, pourcentage, justification) VALUES
 -- R1 Salaires indirects : cle = effectif affecte a chaque activite
 (1,1,2, 8.00,'Effectif service achats'),
-(1,2,2,10.00,'Magasinier et manoeuvres de stockage'),
-(1,3,2,12.00,'Regleurs de presse'),
-(1,4,2,20.00,'Chefs d equipe de production'),
+(1,2,2,10.00,'Magasinier et manœuvres de stockage'),
+(1,3,2,12.00,'Régleurs de presse'),
+(1,4,2,20.00,'Chefs d''équipe de production'),
 (1,5,2,10.00,'Surveillance des aires de cure'),
 (1,6,2,12.00,'Laborantin et aide-laborantin'),
-(1,7,2,18.00,'Equipe palettisation et chargement'),
+(1,7,2,18.00,'Équipe palettisation et chargement'),
 (1,8,2,10.00,'Administration des ventes'),
 -- R2 Energie et eau : cle = releves de compteurs kWh et m3
 (2,1,2, 1.00,'Bureaux du service achats'),
-(2,2,2, 3.00,'Eclairage et manutention du magasin'),
+(2,2,2, 3.00,'Éclairage et manutention du magasin'),
 (2,3,2, 6.00,'Consommation pendant les changements de moule'),
 (2,4,2,55.00,'Malaxeur et presse vibrante'),
-(2,5,2,20.00,'Eau d arrosage et brumisation de cure'),
-(2,6,2, 3.00,'Presse d essai du laboratoire'),
-(2,7,2, 8.00,'Chariots elevateurs et zone de chargement'),
+(2,5,2,20.00,'Eau d''arrosage et brumisation de cure'),
+(2,6,2, 3.00,'Presse d''essai du laboratoire'),
+(2,7,2, 8.00,'Chariots élévateurs et zone de chargement'),
 (2,8,2, 4.00,'Bureaux commerciaux'),
 -- R3 Loyer du site : cle = surface occupee en m2
 (3,1,2, 4.00,'Bureaux achats'),
-(3,2,2,16.00,'Aire de stockage ciment, sable et laterite'),
+(3,2,2,16.00,'Aire de stockage ciment, sable et latérite'),
 (3,3,2, 5.00,'Atelier moules'),
 (3,4,2,20.00,'Halle de malaxage et pressage'),
-(3,5,2,30.00,'Aires de sechage et de cure (poste le plus etendu)'),
-(3,6,2, 5.00,'Laboratoire d essais'),
+(3,5,2,30.00,'Aires de séchage et de cure (poste le plus étendu)'),
+(3,6,2, 5.00,'Laboratoire d''essais'),
 (3,7,2,12.00,'Aire de palettisation et quai de chargement'),
 (3,8,2, 8.00,'Bureaux commerciaux'),
 -- R4 Amortissements : cle = valeur brute des equipements affectes
-(4,1,2, 2.00,'Materiel informatique achats'),
+(4,1,2, 2.00,'Matériel informatique achats'),
 (4,2,2, 8.00,'Chargeur, bennes et bacs de stockage'),
-(4,3,2,14.00,'Jeux de moules et outillage de reglage'),
+(4,3,2,14.00,'Jeux de moules et outillage de réglage'),
 (4,4,2,45.00,'Presse vibrante et malaxeur'),
-(4,5,2, 6.00,'Bâches, rateliers et systeme de brumisation'),
-(4,6,2, 7.00,'Presse d essai et etuve du laboratoire'),
-(4,7,2,14.00,'Chariots elevateurs et cercleuse'),
-(4,8,2, 4.00,'Materiel de bureau'),
+(4,5,2, 6.00,'Bâches, râteliers et système de brumisation'),
+(4,6,2, 7.00,'Presse d''essai et étuve du laboratoire'),
+(4,7,2,14.00,'Chariots élévateurs et cercleuse'),
+(4,8,2, 4.00,'Matériel de bureau'),
 -- R5 Fournitures et pieces d usure : cle = bons de sortie magasin
 (5,1,2, 4.00,'Fournitures administratives'),
 (5,2,2, 4.00,'Consommables de magasin'),
-(5,3,2,32.00,'Moules, cales et huile de demoulage (poste dominant)'),
-(5,4,2,25.00,'Adjuvants, lubrifiants et pieces d usure presse'),
+(5,3,2,32.00,'Moules, cales et huile de démoulage (poste dominant)'),
+(5,4,2,25.00,'Adjuvants, lubrifiants et pièces d''usure presse'),
 (5,5,2, 8.00,'Bâches et films de cure'),
-(5,6,2,15.00,'Consommables de laboratoire et eprouvettes'),
-(5,7,2, 8.00,'Feuillards, films et cornieres de palettisation'),
+(5,6,2,15.00,'Consommables de laboratoire et éprouvettes'),
+(5,7,2, 8.00,'Feuillards, films et cornières de palettisation'),
 (5,8,2, 4.00,'Fournitures commerciales'),
 -- R6 Services exterieurs : cle = analyse des factures fournisseurs
-(6,1,2,14.00,'Telecom et deplacements achats'),
-(6,2,2, 6.00,'Transport sur achats de matieres'),
+(6,1,2,14.00,'Télécom et déplacements achats'),
+(6,2,2, 6.00,'Transport sur achats de matières'),
 (6,3,2, 4.00,'Rectification externe des moules'),
 (6,4,2, 8.00,'Maintenance externe de la presse'),
 (6,5,2, 2.00,'Analyses externes de cure'),
-(6,6,2, 6.00,'Essais en laboratoire agree (LBTP)'),
+(6,6,2, 6.00,'Essais en laboratoire agréé (LBTP)'),
 (6,7,2,40.00,'Transport sur ventes vers chantiers (poste dominant)'),
-(6,8,2,20.00,'Telecom et frais commerciaux');
+(6,8,2,20.00,'Télécom et frais commerciaux');
 
 -- ---------------------------------------------------------------------
 -- 3.5 Objets de cout : la gamme A & P Briques
 -- ---------------------------------------------------------------------
 INSERT INTO objets_cout (code, libelle, type_objet, famille, unite) VALUES
-('B1', 'Brique creuse 15 x 20 x 40',        'PRODUIT', 'Maconnerie',   'unite'),
-('B2', 'Brique pleine 10 x 20 x 40',        'PRODUIT', 'Maconnerie',   'unite'),
-('B3', 'Pave autobloquant colore 8 cm',     'PRODUIT', 'Voirie',       'unite'),
-('B4', 'Bordure de trottoir T2',            'PRODUIT', 'Voirie',       'unite');
+('B1', 'Brique creuse 15 x 20 x 40',        'PRODUIT', 'Maçonnerie',   'unité'),
+('B2', 'Brique pleine 10 x 20 x 40',        'PRODUIT', 'Maçonnerie',   'unité'),
+('B3', 'Pavé autobloquant coloré 8 cm',     'PRODUIT', 'Voirie',       'unité'),
+('B4', 'Bordure de trottoir T2',            'PRODUIT', 'Voirie',       'unité');
 
 -- Couts directs, volumes et prix de vente - juin 2026
 -- Total MOD = 10 000 000 FCFA
@@ -616,9 +621,9 @@ FROM consommations WHERE periode_id = 2;
 -- 3.8 Amorce du journal d'audit
 -- ---------------------------------------------------------------------
 INSERT INTO journal_audit (utilisateur_id, action, table_cible, id_cible, details, adresse_ip) VALUES
-(1, 'INSTALL', NULL, NULL, 'Installation de la base et chargement du jeu de demonstration A & P Briques', '127.0.0.1'),
-(2, 'CREATE',  'cles_ressources', '2026-06', 'Saisie des cles de repartition de juin 2026', '127.0.0.1'),
-(2, 'UPDATE',  'periodes', '2026-05', 'Cloture de la periode mai 2026', '127.0.0.1');
+(1, 'INSTALL', NULL, NULL, 'Installation de la base et chargement du jeu de démonstration A & P Briques', '127.0.0.1'),
+(2, 'CREATE',  'cles_ressources', '2026-06', 'Saisie des clés de répartition de juin 2026', '127.0.0.1'),
+(2, 'UPDATE',  'periodes', '2026-05', 'Clôture de la période mai 2026', '127.0.0.1');
 
 -- =====================================================================
 --  4. REQUETES DE VERIFICATION (a executer apres import)
