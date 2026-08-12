@@ -151,6 +151,11 @@ th.text-end {
   font-variant-numeric: tabular-nums;
 }
 
+/* ---------- Barres de progression (analyse de Pareto) ---------- */
+.bg-brique-bar {
+  background-color: var(--brique);
+}
+
 /* ---------- Tableaux ---------- */
 .table > :not(caption) > * > * {
   padding: 0.45rem 0.6rem;
