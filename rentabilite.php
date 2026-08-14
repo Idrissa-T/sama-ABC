@@ -226,6 +226,9 @@ afficherEntete('Rentabilité par objet de coût', $periode);
 </div>
 
 <div class="d-flex flex-wrap gap-2">
+  <a href="export_pdf.php?periode=<?= $periodeId ?>&amp;etat=rentabilite" class="btn btn-brique">
+    Rapport PDF de rentabilité
+  </a>
   <a href="export_csv.php?periode=<?= $periodeId ?>&amp;etat=rentabilite" class="btn btn-outline-secondary">
     Export CSV
   </a>

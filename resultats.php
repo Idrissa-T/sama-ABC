@@ -234,6 +234,9 @@ afficherEntete('Coûts des activités et des inducteurs', $periode);
   <a href="comparaison.php?periode=<?= $periodeId ?>" class="btn btn-brique">
     Étape 3 — Comparaison classique vs ABC
   </a>
+  <a href="export_pdf.php?periode=<?= $periodeId ?>&amp;etat=activites" class="btn btn-outline-secondary">
+    État PDF des coûts d'activités
+  </a>
   <a href="export_csv.php?periode=<?= $periodeId ?>&amp;etat=activites" class="btn btn-outline-secondary">
     Export CSV des activités
   </a>

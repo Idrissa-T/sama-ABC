@@ -287,6 +287,12 @@ afficherEntete('Comparaison — méthode classique vs ABC', $periode);
   <a href="rentabilite.php?periode=<?= $periodeId ?>" class="btn btn-brique">
     Analyse de rentabilité par objet
   </a>
+  <?php if ($objetChoisi !== null): ?>
+  <a href="export_pdf.php?periode=<?= $periodeId ?>&amp;etat=fiche&amp;objet=<?= (int) $objetChoisi['objet_cout_id'] ?>"
+     class="btn btn-outline-secondary">
+    Fiche PDF de <?= e($objetChoisi['objet_code']) ?>
+  </a>
+  <?php endif; ?>
   <a href="export_csv.php?periode=<?= $periodeId ?>&amp;etat=comparaison" class="btn btn-outline-secondary">
     Export CSV
   </a>
